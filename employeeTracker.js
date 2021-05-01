@@ -85,7 +85,6 @@ const addDepartment = () => {
             connection.query('INSERT INTO department (name) VALUES (?)', [answer.deptName], (err, res) => {
                 if (err) throw err;
                 console.log(`Your department has been added!`)
-                runSearch();
             })
         })
 }
@@ -133,7 +132,6 @@ const addRole = () => {
                         if (err) throw err;
                         console.log('Your role has been added!')
                     });
-                runSearch();
             })
     })
 }
@@ -178,19 +176,30 @@ const addEmployee = () => {
                         roleId = res[j].id;
                     }
                 }
-                connection.query('INSERT INTO employee SET ?',
-                    {
-                        first_name: answer.firstName,
-                        last_name: answer.lastName,
-                        manager_id: answer.managerId,
-                        role_id: roleId
-                    }, function (err) {
-                        if (err) throw err;
-                        console.log('Your employee has been added!')
-                    });
-                runSearch();
-            })
-    })
+                if (answer.managerId) {
+                    connection.query('INSERT INTO employee SET ?',
+                        {
+                            first_name: answer.firstName,
+                            last_name: answer.lastName,
+                            manager_id: answer.managerId,
+                            role_id: roleId
+                        }, function (err) {
+                            if (err) throw err;
+                            console.log('Your employee has been added!')
+                        });
+                } else {
+                    connection.query('INSERT INTO employee SET ?',
+                        {
+                            first_name: answer.firstName,
+                            last_name: answer.lastName,
+                            role_id: roleId
+                        }, function (err) {
+                            if (err) throw err;
+                            console.log('Your employee has been added!')
+                        });
+                }
+            });
+    });
 }
 
 //View Department, Role, or Employee
@@ -228,7 +237,6 @@ const listAllDepartments = () => {
         console.log('DEPARTMENTS:');
         console.table(res);
     });
-    runSearch();
 }
 
 const listAllRoles = () => {
@@ -238,7 +246,6 @@ const listAllRoles = () => {
         console.log('ROLES:');
         console.table(res);
     });
-    runSearch();
 }
 
 const listAllEmployees = () => {
@@ -248,8 +255,6 @@ const listAllEmployees = () => {
         console.log('EMPLOYEES:');
         console.table(res);
     });
-    runSearch();
-
 }
 
 //UPDATE EMPLOYEE ROLE OR DEPARTMENT
@@ -267,7 +272,7 @@ const updateEmployee = () => {
         })
         .then((answer) => {
             switch (answer.item) {
-                case 'Employee Manger':
+                case 'Employee Manager':
                     updateEmpManager();
                     break;
                 case 'Employee Role':
@@ -301,7 +306,6 @@ const updateEmpRole = () => {
                     console.log('Employee role updated!')
                 }
             )
-            runSearch();
         })
 }
 
@@ -328,7 +332,6 @@ const updateEmpManager = () => {
                     console.log('Employee manager updated!')
                 }
             )
-            runSearch();
         })
 }
 
@@ -368,7 +371,7 @@ const deleteDepartment = () => {
             type: 'input',
             message: 'Input the ID of the department to delete:'
         })
-        .then(function(answer){
+        .then(function (answer) {
             connection.query('DELETE FROM department WHERE id=?',
                 answer.department,
                 (err, res) => {
@@ -376,8 +379,7 @@ const deleteDepartment = () => {
                     console.log('Department deleted!')
                 }
             )
-            runSearch();
-        })
+        });
 }
 
 const deleteRole = () => {
@@ -388,7 +390,7 @@ const deleteRole = () => {
             type: 'input',
             message: 'Input the ID of the role to delete:'
         })
-        .then(function(answer){
+        .then(function (answer) {
             connection.query('DELETE FROM role WHERE id=?',
                 answer.role,
                 (err, res) => {
@@ -396,8 +398,7 @@ const deleteRole = () => {
                     console.log('Role deleted!')
                 }
             )
-            runSearch();
-        })
+        });
 }
 
 const deleteEmployee = () => {
@@ -408,7 +409,7 @@ const deleteEmployee = () => {
             type: 'input',
             message: 'Input the ID of the employee to delete:'
         })
-        .then(function(answer){
+        .then(function (answer) {
             connection.query('DELETE FROM employee WHERE id=?',
                 answer.employee,
                 (err, res) => {
@@ -416,6 +417,5 @@ const deleteEmployee = () => {
                     console.log('Employee deleted!')
                 }
             )
-            runSearch();
-        })
+        });
 }
